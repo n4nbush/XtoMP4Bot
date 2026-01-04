@@ -56,8 +56,12 @@ def main():
 
     # Iniciar el bot
     print("🤖 Bot iniciado...")
-    app.run_polling()
-
+    app.run_webhook(
+        listen="0.0.0.0",
+        port=8000,
+        url_path="telegram",
+        webhook_url="https://xtomp4bot.onrender.com/telegram"
+    )
     
 
 if __name__ == '__main__':
