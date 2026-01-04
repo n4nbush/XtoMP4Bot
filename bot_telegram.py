@@ -1,12 +1,28 @@
-from telegram import Update
+from telegram import Update, Bot
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 import funciones
-import os
+import os, asyncio
 from dotenv import load_dotenv
+from flask import Flask, request
+
+app = Flask(__name__)
+
 
 # 🔑 Token del chat bot
 load_dotenv()
 TOKEN = os.getenv("token")
+bot = Bot(token=TOKEN)
+
+
+@app.route(f'/{TOKEN}', methods=['POST'])
+def webhook():
+    # Telegram envía el update como JSON
+    update = Update.de_json(request.get_json(), bot)
+    
+    # Procesar el mensaje
+    asyncio.run(xtomp4(update))
+    
+    return 'ok'
 
 async def start(update:  Update, context: ContextTypes. DEFAULT_TYPE):
     await update.message.reply_text("¡Hola!  Soy tu bot de descargas de Twitter 🤖")
@@ -45,5 +61,8 @@ def main():
     
 
 if __name__ == '__main__':
-    main()
-
+    # Configurar webhook (solo una vez)
+    webhook_url = "https://xtomp4bot.onrender.com" + TOKEN
+    asyncio.run(bot.set_webhook(webhook_url))
+    
+    app.run(host='0.0.0.0', port=5000)
